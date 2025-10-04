@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="100%" stop-color="#C4B5FD" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Simplified flow lines -->
+  <path d="M20 30 Q40 10, 60 30 T100 30" stroke="url(#flowGradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M20 50 Q40 30, 60 50 T100 50" stroke="url(#flowGradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M20 70 Q40 50, 60 70 T100 70" stroke="url(#flowGradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- Connection points -->
+  <circle cx="20" cy="30" r="5" fill="url(#flowGradient)"/>
+  <circle cx="60" cy="30" r="5" fill="url(#flowGradient)"/>
+  <circle cx="100" cy="30" r="5" fill="url(#flowGradient)"/>
+</svg>

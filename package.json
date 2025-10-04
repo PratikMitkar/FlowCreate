@@ -1,6 +1,7 @@
 {
-  "name": "FlowCreate",
-  "version": "0.1.0",
+  "name": "flowcreate",
+  "version": "1.0.0",
+  "description": "A modern tool for creating beautiful flowcharts and diagrams using Mermaid syntax with real-time preview and multiple theme options.",
   "private": true,
   "scripts": {
     "build": "next build",
@@ -8,6 +9,27 @@
     "lint": "next lint",
     "start": "next start"
   },
+  "keywords": [
+    "flowchart",
+    "diagram",
+    "mermaid",
+    "visualization",
+    "nextjs",
+    "react",
+    "tailwindcss",
+    "shadcn-ui",
+    "typescript"
+  ],
+  "author": "Pratik Vikas Mitkar <pratikmitkar12@gmail.com> (+91 9665344075)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PratikVMitkar/flowcreate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PratikVMitkar/flowcreate/issues"
+  },
+  "homepage": "https://github.com/PratikVMitkar/flowcreate#readme",
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
