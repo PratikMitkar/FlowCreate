@@ -67,9 +67,14 @@ Our interface features a modern glassmorphism design with:
 ### GitHub Pages Setup
 
 1. **Fork or clone this repository**
-2. **Update the repository name in configuration files:**
-   - In `next.config.mjs`, update the `basePath` and `assetPrefix` to match your repository name
-   - If your repository is named `my-flowcharts`, change `/FlowCreate` to `/my-flowcharts`
+2. **Update the repository name in configuration files using the provided script:**
+   ```bash
+   # On Windows
+   scripts\update-config.bat FlowCreate
+   
+   # On macOS/Linux
+   node scripts/update-config.js FlowCreate
+   ```
 3. **Enable GitHub Pages:**
    - Go to your repository settings
    - Navigate to "Pages" in the left sidebar
@@ -77,6 +82,8 @@ Our interface features a modern glassmorphism design with:
 4. **Push to the `main` branch to trigger automatic deployment**
 
 Your site will be available at `https://[your-username].github.io/FlowCreate/`
+
+For detailed deployment instructions, see [GITHUB_DEPLOYMENT_GUIDE.md](GITHUB_DEPLOYMENT_GUIDE.md)
 
 ### Vercel (Recommended)
 For the best experience, deploy to Vercel:
