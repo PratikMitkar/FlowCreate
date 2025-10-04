@@ -9,9 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // GitHub Pages configuration
-  basePath: process.env.NODE_ENV === 'production' ? '/flowcreate' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/flowcreate/' : '',
+  // GitHub Pages configuration - Update this to match your repository name
+  basePath: process.env.NODE_ENV === 'production' ? '/FlowCreate' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/FlowCreate/' : '',
   // Static export configuration
   output: 'export',
 }

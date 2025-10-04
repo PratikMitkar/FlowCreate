@@ -24,12 +24,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PratikVMitkar/flowcreate.git"
+    "url": "https://github.com/PratikVMitkar/FlowCreate.git"
   },
   "bugs": {
-    "url": "https://github.com/PratikVMitkar/flowcreate/issues"
+    "url": "https://github.com/PratikVMitkar/FlowCreate/issues"
   },
-  "homepage": "https://github.com/PratikVMitkar/flowcreate#readme",
+  "homepage": "https://github.com/PratikVMitkar/FlowCreate#readme",
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",

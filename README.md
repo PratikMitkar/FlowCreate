@@ -1,9 +1,8 @@
 # FlowCreate 🌊
 
-[![Deploy to GitHub Pages](https://github.com/PratikVMitkar/flowcreate/actions/workflows/deploy.yml/badge.svg)](https://github.com/PratikVMitkar/flowcreate/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub repo size](https://img.shields.io/github/repo-size/PratikVMitkar/flowcreate)
-![GitHub stars](https://img.shields.io/github/stars/PratikVMitkar/flowcreate?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/PratikVMitkar/FlowCreate)
+![GitHub stars](https://img.shields.io/github/stars/PratikVMitkar/FlowCreate?style=social)
 
 **FlowCreate** is a modern, intuitive tool for creating beautiful flowcharts and diagrams using Mermaid syntax. With a sleek UI and real-time preview, it makes diagram creation effortless and enjoyable.
 
@@ -65,19 +64,24 @@ Our interface features a modern glassmorphism design with:
 
 ## 📦 Deployment
 
-### GitHub Pages
-This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+### GitHub Pages Setup
 
-1. Fork this repository
-2. Enable GitHub Pages in your repository settings
-3. Push to the `main` branch to trigger automatic deployment
+1. **Fork or clone this repository**
+2. **Update the repository name in configuration files:**
+   - In `next.config.mjs`, update the `basePath` and `assetPrefix` to match your repository name
+   - If your repository is named `my-flowcharts`, change `/FlowCreate` to `/my-flowcharts`
+3. **Enable GitHub Pages:**
+   - Go to your repository settings
+   - Navigate to "Pages" in the left sidebar
+   - Under "Build and deployment", select "GitHub Actions"
+4. **Push to the `main` branch to trigger automatic deployment**
 
-Your site will be available at `https://[your-username].github.io/flowcreate/`
+Your site will be available at `https://[your-username].github.io/FlowCreate/`
 
 ### Vercel (Recommended)
 For the best experience, deploy to Vercel:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPratikVMitkar%2Fflowcreate)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPratikVMitkar%2FFlowCreate)
 
 ## 📚 Learn More
 
