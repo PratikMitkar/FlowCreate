@@ -32,22 +32,49 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 ## Deploy on GitHub Pages
 
-To deploy this project on GitHub Pages, follow these steps:
+### Automated Deployment (Recommended)
 
+This project includes scripts to automate the deployment process:
+
+**On Windows:**
+```bash
+deploy-to-github.bat
+```
+
+**On macOS/Linux:**
+```bash
+chmod +x deploy-to-github.sh
+./deploy-to-github.sh
+```
+
+The scripts will:
 1. Create a new repository on GitHub
 2. Push your code to the repository
+3. Configure GitHub Pages automatically
+
+### Manual Deployment
+
+To manually deploy this project on GitHub Pages, follow these steps:
+
+1. Create a new repository on GitHub
+2. Push your code to the repository:
+   ```bash
+   git remote add origin https://github.com/your-username/your-repo-name.git
+   git branch -M main
+   git push -u origin main
+   ```
 3. In your repository settings, go to "Pages"
 4. Under "Build and deployment", select "GitHub Actions"
 5. The deployment workflow is already configured in `.github/workflows/deploy.yml`
 
 The site will automatically deploy whenever you push to the `main` branch.
 
-### Manual Deployment
+### Manual Static Deployment
 
 If you prefer to deploy manually, you can:
 
 ```bash
-npm run build-export
+npm run build
 ```
 
 This will generate an `out` directory that you can deploy to any static hosting service.
