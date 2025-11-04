@@ -9,6 +9,35 @@ interface MermaidChartProps {
   height?: number
   style?: string
   direction?: "TD" | "LR" | "RL" | "BT"
+  customColors?: {
+    primaryColor?: string
+    secondaryColor?: string
+    tertiaryColor?: string
+    backgroundColor?: string
+    textColor?: string // Text inside primary nodes
+    secondaryTextColor?: string // Text inside secondary nodes
+    tertiaryTextColor?: string // Text inside tertiary nodes
+    labelTextColor?: string // Text outside nodes (labels, edge text)
+    lineColor?: string
+    accentColor?: string
+    borderColor?: string
+  }
+  customStyles?: {
+    nodeShape?: string
+    nodeSize?: number
+    lineStyle?: string
+    lineThickness?: number
+    cornerRadius?: number
+    fontSize?: number
+    fontFamily?: string
+    fontWeight?: string
+    nodeSpacing?: number
+    levelSpacing?: number
+    padding?: number
+    shadow?: boolean
+    gradient?: boolean
+    animation?: boolean
+  }
 }
 
 // Define supported diagram types
@@ -16,7 +45,7 @@ type DiagramType = 'flowchart' | 'sequence' | 'gantt' | 'class' | 'state' | 'pie
 
 const getDiagramType = (chart: string): DiagramType => {
   const chartLower = chart.trim().toLowerCase();
-  
+
   if (chartLower.startsWith('graph') || chartLower.startsWith('flowchart')) {
     return 'flowchart';
   } else if (chartLower.startsWith('sequence')) {
@@ -285,14 +314,27 @@ export default function MermaidChart({
   height = 1080,
   style = "pastel",
   direction = "TD",
+  customColors,
+  customStyles,
 }: MermaidChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Helper function to validate hex colors
+  const isValidHexColor = (color: string): boolean => {
+    return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)
+  }
+
+  // Helper function to sanitize color values
+  const sanitizeColor = (color: string | undefined, fallback: string): string => {
+    if (!color) return fallback
+    return isValidHexColor(color) ? color : fallback
+  }
+
   useEffect(() => {
     // Determine curve style based on selected style
     let curveStyle: any = "basis";
-    switch(style) {
+    switch (style) {
       case "pastel":
         curveStyle = "linear";
         break;
@@ -305,24 +347,151 @@ export default function MermaidChart({
       default:
         curveStyle = "basis";
     }
-    
-    const selectedStyle = stylePresets[style as keyof typeof stylePresets] || stylePresets.pastel
 
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: "base",
-      themeVariables: selectedStyle,
-      flowchart: {
-        useMaxWidth: false,
-        htmlLabels: true,
-        curve: curveStyle,
-        padding: 30,
-        nodeSpacing: direction === "LR" || direction === "RL" ? 120 : 100,
-        rankSpacing: direction === "LR" || direction === "RL" ? 150 : 100,
-        diagramPadding: 20,
-      },
-    })
-  }, [style, direction])
+    // Get base style preset
+    const baseStyle = stylePresets[style as keyof typeof stylePresets] || stylePresets.pastel
+
+    // Sanitize custom colors before applying
+    const sanitizedPrimaryColor = sanitizeColor(customColors?.primaryColor, baseStyle.primaryColor)
+    const sanitizedSecondaryColor = sanitizeColor(customColors?.secondaryColor, baseStyle.secondaryColor)
+    const sanitizedTertiaryColor = sanitizeColor(customColors?.tertiaryColor, baseStyle.tertiaryColor)
+    const sanitizedBackgroundColor = sanitizeColor(customColors?.backgroundColor, baseStyle.background)
+    const sanitizedTextColor = sanitizeColor(customColors?.textColor, baseStyle.primaryTextColor)
+    const sanitizedSecondaryTextColor = sanitizeColor(customColors?.secondaryTextColor, baseStyle.secondaryTextColor)
+    const sanitizedTertiaryTextColor = sanitizeColor(customColors?.tertiaryTextColor, baseStyle.tertiaryTextColor)
+    const sanitizedLabelTextColor = sanitizeColor(customColors?.labelTextColor, baseStyle.textColor)
+    const sanitizedBorderColor = sanitizeColor(customColors?.borderColor, baseStyle.primaryBorderColor)
+
+    // Sanitize additional colors
+    const sanitizedLineColor = sanitizeColor(customColors?.lineColor, baseStyle.lineColor)
+    const sanitizedAccentColor = sanitizeColor(customColors?.accentColor, baseStyle.primaryColor)
+
+    // Override with custom colors if provided (using sanitized colors)
+    const selectedStyle = {
+      ...baseStyle,
+      ...(customColors?.primaryColor && isValidHexColor(customColors.primaryColor) && {
+        primaryColor: sanitizedPrimaryColor,
+        mainBkg: sanitizedPrimaryColor,
+      }),
+      ...(customColors?.secondaryColor && isValidHexColor(customColors.secondaryColor) && {
+        secondaryColor: sanitizedSecondaryColor,
+        secondBkg: sanitizedSecondaryColor,
+      }),
+      ...(customColors?.tertiaryColor && isValidHexColor(customColors.tertiaryColor) && {
+        tertiaryColor: sanitizedTertiaryColor,
+        tertiaryBkg: sanitizedTertiaryColor,
+      }),
+      ...(customColors?.borderColor && isValidHexColor(customColors.borderColor) && {
+        primaryBorderColor: sanitizedBorderColor,
+        nodeBorder: sanitizedBorderColor,
+        border1: sanitizedBorderColor,
+        border2: sanitizedBorderColor,
+      }),
+      ...(customColors?.backgroundColor && isValidHexColor(customColors.backgroundColor) && {
+        background: sanitizedBackgroundColor,
+        edgeLabelBackground: sanitizedBackgroundColor,
+      }),
+      ...(customColors?.textColor && isValidHexColor(customColors.textColor) && {
+        // Primary node text color
+        primaryTextColor: sanitizedTextColor,
+      }),
+      ...(customColors?.secondaryTextColor && isValidHexColor(customColors.secondaryTextColor) && {
+        // Secondary node text color
+        secondaryTextColor: sanitizedSecondaryTextColor,
+      }),
+      ...(customColors?.tertiaryTextColor && isValidHexColor(customColors.tertiaryTextColor) && {
+        // Tertiary node text color
+        tertiaryTextColor: sanitizedTertiaryTextColor,
+      }),
+      ...(customColors?.labelTextColor && isValidHexColor(customColors.labelTextColor) && {
+        // Label text color (text outside boxes - labels, edge text)
+        textColor: sanitizedLabelTextColor,
+        titleColor: sanitizedLabelTextColor,
+      }),
+      ...(customColors?.lineColor && isValidHexColor(customColors.lineColor) && {
+        lineColor: sanitizedLineColor,
+        defaultLinkColor: sanitizedLineColor,
+      }),
+      ...(customColors?.accentColor && isValidHexColor(customColors.accentColor) && {
+        accentColor: sanitizedAccentColor,
+      }),
+      // Apply custom typography
+      ...(customStyles?.fontSize && {
+        fontSize: `${customStyles.fontSize}px`,
+      }),
+      ...(customStyles?.fontFamily && {
+        fontFamily: customStyles.fontFamily,
+      }),
+    }
+
+    try {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: selectedStyle,
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: false,
+          htmlLabels: true,
+          curve: curveStyle,
+          padding: customStyles?.padding || 30,
+          nodeSpacing: customStyles?.nodeSpacing || (direction === "LR" || direction === "RL" ? 120 : 100),
+          rankSpacing: customStyles?.levelSpacing || (direction === "LR" || direction === "RL" ? 150 : 100),
+          diagramPadding: customStyles?.padding || 20,
+        },
+        sequence: {
+          useMaxWidth: false,
+          diagramMarginX: customStyles?.padding || 50,
+          diagramMarginY: customStyles?.padding || 10,
+          actorMargin: customStyles?.nodeSpacing || 50,
+          width: customStyles?.nodeSize || 150,
+          height: customStyles?.nodeSize || 65,
+        },
+        gantt: {
+          useMaxWidth: false,
+          leftPadding: customStyles?.padding || 75,
+          gridLineStartPadding: customStyles?.padding || 35,
+        },
+        class: {
+          useMaxWidth: false,
+        },
+        state: {
+          useMaxWidth: false,
+        },
+        pie: {
+          useMaxWidth: false,
+          textPosition: 0.5,
+        },
+        er: {
+          useMaxWidth: false,
+          entityPadding: customStyles?.padding || 15,
+        },
+        journey: {
+          useMaxWidth: false,
+          diagramMarginX: customStyles?.padding || 50,
+          diagramMarginY: customStyles?.padding || 10,
+        },
+      })
+    } catch (error) {
+      console.error("Mermaid initialization error:", error)
+      // Fallback to base style if custom colors cause issues
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: baseStyle,
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: false,
+          htmlLabels: true,
+          curve: curveStyle,
+          padding: 30,
+          nodeSpacing: direction === "LR" || direction === "RL" ? 120 : 100,
+          rankSpacing: direction === "LR" || direction === "RL" ? 150 : 100,
+          diagramPadding: 20,
+        },
+      })
+    }
+  }, [style, direction, customColors, customStyles])
 
   useEffect(() => {
     const renderChart = async () => {
@@ -331,10 +500,10 @@ export default function MermaidChart({
       try {
         setError(null)
         let transformedChart = chart;
-        
+
         // Get diagram type
         const diagramType = getDiagramType(chart);
-        
+
         // Only transform flowchart directions
         if (diagramType === 'flowchart') {
           transformedChart = chart.replace(/^graph\s+(TD|LR|RL|BT)/m, `graph ${direction}`)
@@ -348,48 +517,238 @@ export default function MermaidChart({
         const svgElement = svgDoc.querySelector("svg")
 
         if (svgElement) {
-          // Apply special styling only to flowcharts
-          if (diagramType === 'flowchart' && style === "pastel") {
-            const paths = svgElement.querySelectorAll("path.flowchart-link")
+          // Apply custom line styles based on diagram type
+          if (diagramType === 'flowchart' || diagramType === 'sequence' || diagramType === 'state') {
+            const paths = svgElement.querySelectorAll("path")
             paths.forEach((path) => {
-              path.setAttribute("stroke-dasharray", "5,5")
-              path.setAttribute("stroke-width", "2")
+              // Apply line thickness
+              if (customStyles?.lineThickness) {
+                path.setAttribute("stroke-width", customStyles.lineThickness.toString())
+              }
+
+              // Apply line style
+              if (customStyles?.lineStyle) {
+                switch (customStyles.lineStyle) {
+                  case "dashed":
+                    path.setAttribute("stroke-dasharray", "8,4")
+                    break;
+                  case "dotted":
+                    path.setAttribute("stroke-dasharray", "2,2")
+                    break;
+                  case "solid":
+                  default:
+                    path.setAttribute("stroke-dasharray", "0")
+                    break;
+                }
+              } else if (style === "pastel") {
+                // Default pastel style
+                path.setAttribute("stroke-dasharray", "5,5")
+                path.setAttribute("stroke-width", "2")
+              }
             })
 
+            // Ensure markers don't inherit dash patterns
             const markers = svgElement.querySelectorAll("marker path")
             markers.forEach((marker) => {
               marker.setAttribute("stroke-dasharray", "0")
             })
           }
 
-          // Apply rounded corners only to flowcharts
-          if (diagramType === 'flowchart') {
+          // Apply custom corner radius and shapes based on diagram type
+          if (diagramType === 'flowchart' || diagramType === 'class' || diagramType === 'er') {
             const rects = svgElement.querySelectorAll("rect")
             rects.forEach((rect) => {
-              // Different corner radii based on style
               let rx = "12";
               let ry = "12";
-              
-              switch(style) {
-                case "corporate":
-                  rx = "4";
-                  ry = "4";
-                  break;
-                case "minimal":
-                  rx = "0";
-                  ry = "0";
-                  break;
-                case "dark":
-                  rx = "8";
-                  ry = "8";
-                  break;
-                default:
-                  rx = "12";
-                  ry = "12";
+
+              // Use custom corner radius if provided
+              if (customStyles?.cornerRadius !== undefined) {
+                rx = customStyles.cornerRadius.toString();
+                ry = customStyles.cornerRadius.toString();
+              } else {
+                // Default corner radii based on style and diagram type
+                switch (diagramType) {
+                  case "class":
+                    rx = "4";
+                    ry = "4";
+                    break;
+                  case "er":
+                    rx = "8";
+                    ry = "8";
+                    break;
+                  default:
+                    switch (style) {
+                      case "corporate":
+                        rx = "4";
+                        ry = "4";
+                        break;
+                      case "minimal":
+                        rx = "0";
+                        ry = "0";
+                        break;
+                      case "dark":
+                        rx = "8";
+                        ry = "8";
+                        break;
+                      default:
+                        rx = "12";
+                        ry = "12";
+                    }
+                }
               }
-              
+
               rect.setAttribute("rx", rx)
               rect.setAttribute("ry", ry)
+            })
+          }
+
+          // Apply custom node shapes and sizes based on diagram type
+          if (customStyles?.nodeShape || customStyles?.nodeSize) {
+            const nodes = svgElement.querySelectorAll("g.node")
+            nodes.forEach((node) => {
+              const rect = node.querySelector("rect")
+              if (rect) {
+                const originalWidth = parseFloat(rect.getAttribute("width") || "0")
+                const originalHeight = parseFloat(rect.getAttribute("height") || "0")
+                const x = parseFloat(rect.getAttribute("x") || "0")
+                const y = parseFloat(rect.getAttribute("y") || "0")
+
+                // Calculate size based on nodeSize setting
+                const sizeMultiplier = customStyles?.nodeSize ? customStyles.nodeSize / 100 : 1
+                const width = originalWidth * sizeMultiplier
+                const height = originalHeight * sizeMultiplier
+
+                // Adjust position to keep node centered
+                const newX = x - (width - originalWidth) / 2
+                const newY = y - (height - originalHeight) / 2
+
+                switch (customStyles?.nodeShape) {
+                  case "circle":
+                    if (diagramType === 'flowchart' || diagramType === 'state') {
+                      // Use nodeSize to control circle radius
+                      const baseRadius = Math.min(originalWidth, originalHeight) / 2
+                      const radius = baseRadius * sizeMultiplier
+                      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+                      circle.setAttribute("cx", (x + originalWidth / 2).toString())
+                      circle.setAttribute("cy", (y + originalHeight / 2).toString())
+                      circle.setAttribute("r", radius.toString())
+                      circle.setAttribute("fill", rect.getAttribute("fill") || "")
+                      circle.setAttribute("stroke", rect.getAttribute("stroke") || "")
+                      circle.setAttribute("stroke-width", rect.getAttribute("stroke-width") || "")
+                      rect.parentNode?.replaceChild(circle, rect)
+                    }
+                    break;
+                  case "diamond":
+                    if (diagramType === 'flowchart') {
+                      const diamond = document.createElementNS("http://www.w3.org/2000/svg", "polygon")
+                      const centerX = x + originalWidth / 2
+                      const centerY = y + originalHeight / 2
+                      const halfWidth = width / 2
+                      const halfHeight = height / 2
+                      const points = `${centerX},${centerY - halfHeight} ${centerX + halfWidth},${centerY} ${centerX},${centerY + halfHeight} ${centerX - halfWidth},${centerY}`
+                      diamond.setAttribute("points", points)
+                      diamond.setAttribute("fill", rect.getAttribute("fill") || "")
+                      diamond.setAttribute("stroke", rect.getAttribute("stroke") || "")
+                      diamond.setAttribute("stroke-width", rect.getAttribute("stroke-width") || "")
+                      rect.parentNode?.replaceChild(diamond, rect)
+                    }
+                    break;
+                  case "hexagon":
+                    if (diagramType === 'flowchart') {
+                      const hexagon = document.createElementNS("http://www.w3.org/2000/svg", "polygon")
+                      const centerX = x + originalWidth / 2
+                      const centerY = y + originalHeight / 2
+                      const halfWidth = width / 2
+                      const halfHeight = height / 2
+                      const offset = halfWidth * 0.3
+                      const points = `${centerX - offset},${centerY - halfHeight} ${centerX + offset},${centerY - halfHeight} ${centerX + halfWidth},${centerY} ${centerX + offset},${centerY + halfHeight} ${centerX - offset},${centerY + halfHeight} ${centerX - halfWidth},${centerY}`
+                      hexagon.setAttribute("points", points)
+                      hexagon.setAttribute("fill", rect.getAttribute("fill") || "")
+                      hexagon.setAttribute("stroke", rect.getAttribute("stroke") || "")
+                      hexagon.setAttribute("stroke-width", rect.getAttribute("stroke-width") || "")
+                      rect.parentNode?.replaceChild(hexagon, rect)
+                    }
+                    break;
+                  case "rectangle":
+                  default:
+                    // Apply size to rectangle
+                    if (customStyles?.nodeSize) {
+                      rect.setAttribute("width", width.toString())
+                      rect.setAttribute("height", height.toString())
+                      rect.setAttribute("x", newX.toString())
+                      rect.setAttribute("y", newY.toString())
+                    }
+                    break;
+                }
+              }
+            })
+          }
+
+          // Apply custom font styles and separate text colors
+          const textElements = svgElement.querySelectorAll("text, tspan")
+          textElements.forEach((textElement) => {
+            // Apply font styles
+            if (customStyles?.fontSize) {
+              textElement.setAttribute("font-size", `${customStyles.fontSize}px`)
+            }
+            if (customStyles?.fontFamily) {
+              textElement.setAttribute("font-family", customStyles.fontFamily)
+            }
+            if (customStyles?.fontWeight) {
+              textElement.setAttribute("font-weight", customStyles.fontWeight)
+            }
+
+            // Apply text colors based on context and node background color
+            const parentNode = textElement.closest('g.node')
+            const isEdgeLabel = textElement.closest('g.edgeLabel') || textElement.closest('g.label')
+            const isTitle = textElement.closest('g.titleText') || textElement.classList.contains('titleText')
+
+            if (parentNode && !isEdgeLabel && !isTitle) {
+              // Text inside nodes/boxes - determine which text color to use based on node background
+              const nodeRect = parentNode.querySelector('rect, circle, polygon')
+              if (nodeRect) {
+                const nodeFillColor = nodeRect.getAttribute('fill') || ''
+
+                // Match node background color to determine appropriate text color
+                let textColorToUse = customColors?.textColor // default to primary
+
+                if (customColors?.secondaryColor && isValidHexColor(customColors.secondaryColor) &&
+                  nodeFillColor.toLowerCase() === customColors.secondaryColor.toLowerCase()) {
+                  textColorToUse = customColors?.secondaryTextColor || customColors?.textColor
+                } else if (customColors?.tertiaryColor && isValidHexColor(customColors.tertiaryColor) &&
+                  nodeFillColor.toLowerCase() === customColors.tertiaryColor.toLowerCase()) {
+                  textColorToUse = customColors?.tertiaryTextColor || customColors?.textColor
+                }
+
+                if (textColorToUse && isValidHexColor(textColorToUse)) {
+                  textElement.setAttribute("fill", textColorToUse)
+                }
+              }
+            } else if (isEdgeLabel || isTitle) {
+              // Text outside nodes (labels, edge text, titles) - use labelTextColor
+              if (customColors?.labelTextColor && isValidHexColor(customColors.labelTextColor)) {
+                textElement.setAttribute("fill", customColors.labelTextColor)
+              }
+            }
+          })
+
+          // Apply shadow effect if enabled
+          if (customStyles?.shadow) {
+            const defs = svgElement.querySelector("defs") || document.createElementNS("http://www.w3.org/2000/svg", "defs")
+            if (!svgElement.querySelector("defs")) {
+              svgElement.insertBefore(defs, svgElement.firstChild)
+            }
+
+            const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter")
+            filter.setAttribute("id", "drop-shadow")
+            filter.innerHTML = `
+              <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+            `
+            defs.appendChild(filter)
+
+            const nodes = svgElement.querySelectorAll("g.node rect, g.node circle, g.node polygon")
+            nodes.forEach((node) => {
+              node.setAttribute("filter", "url(#drop-shadow)")
             })
           }
 
@@ -408,7 +767,7 @@ export default function MermaidChart({
     }
 
     renderChart()
-  }, [chart, width, height, style, direction])
+  }, [chart, width, height, style, direction, customColors, customStyles])
 
   if (error) {
     return (

@@ -12,6 +12,7 @@
 
 - **Real-time Preview** - See your diagrams update as you type
 - **Multiple Diagram Types** - Support for flowcharts, sequence diagrams, gantt charts, and more
+- **AI-Powered Generation** - Convert natural language descriptions to diagrams automatically
 - **Theme Customization** - Choose from 8 beautiful themes (Pastel, Vibrant, Minimal, Ocean, Corporate, Sunset, Forest, Dark)
 - **Export Options** - Export your diagrams as SVG or PNG (with or without background)
 - **Responsive Design** - Works beautifully on all device sizes
@@ -41,7 +42,7 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
 - **[shadcn/ui](https://ui.shadcn.com/)** - Accessible and customizable components
 - **[Mermaid.js](https://mermaid.js.org/)** - Diagramming and charting tool
-- **[Geist Font](https://vercel.com/font)** - Beautiful typeface from Vercel
+- **[Transformers.js](https://github.com/xenova/transformers.js)** - Lightweight browser-based AI models
 - **[Lucide React](https://lucide.dev/)** - Beautiful & consistent icon toolkit
 
 ## 🎨 UI/UX Highlights
@@ -61,6 +62,13 @@ Our interface features a modern glassmorphism design with:
 - Works on mobile, tablet, and desktop
 - Adaptive component sizing
 - Touch-friendly controls
+
+### AI Assistant
+Our AI assistant can convert natural language descriptions into Mermaid diagrams:
+- Works entirely in the browser (no server required)
+- Supports all diagram types (flowcharts, sequence diagrams, etc.)
+- Privacy-focused - your data never leaves your device
+- Template-based generation for fast results
 
 ## 📦 Deployment
 
@@ -99,6 +107,10 @@ To learn more about the technologies used in this project:
 - [Tailwind CSS](https://tailwindcss.com/) - utility-first CSS framework
 - [shadcn/ui](https://ui.shadcn.com/) - accessible and customizable components
 - [Mermaid](https://mermaid.js.org/) - diagramming and charting tool
+
+## 🤖 AI Features
+
+For detailed information about the AI capabilities, see [AI_FEATURES.md](AI_FEATURES.md)
 
 ## 🤝 Contributing
 
