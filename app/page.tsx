@@ -468,7 +468,7 @@ export default function FlowchartConverter() {
 
         img.onload = () => {
           try {
-            ctx.drawImage(img, 0, 0, actualWidth, actualHeight)
+            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
 
             // Use a try-catch for toBlob to handle tainted canvas
             try {
