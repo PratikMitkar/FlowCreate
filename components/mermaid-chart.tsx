@@ -372,14 +372,38 @@ export default function MermaidChart({
       ...(customColors?.primaryColor && isValidHexColor(customColors.primaryColor) && {
         primaryColor: sanitizedPrimaryColor,
         mainBkg: sanitizedPrimaryColor,
+        // Flowchart specific color mappings
+        cScale0: sanitizedPrimaryColor,
+        cScale1: sanitizedPrimaryColor,
+        cScale2: sanitizedPrimaryColor,
+        // Alternative flowchart color variables
+        c0: sanitizedPrimaryColor,
+        c1: sanitizedPrimaryColor,
+        c2: sanitizedPrimaryColor,
       }),
       ...(customColors?.secondaryColor && isValidHexColor(customColors.secondaryColor) && {
         secondaryColor: sanitizedSecondaryColor,
         secondBkg: sanitizedSecondaryColor,
+        // Flowchart specific color mappings
+        cScale3: sanitizedSecondaryColor,
+        cScale4: sanitizedSecondaryColor,
+        cScale5: sanitizedSecondaryColor,
+        // Alternative flowchart color variables
+        c3: sanitizedSecondaryColor,
+        c4: sanitizedSecondaryColor,
+        c5: sanitizedSecondaryColor,
       }),
       ...(customColors?.tertiaryColor && isValidHexColor(customColors.tertiaryColor) && {
         tertiaryColor: sanitizedTertiaryColor,
         tertiaryBkg: sanitizedTertiaryColor,
+        // Flowchart specific color mappings
+        cScale6: sanitizedTertiaryColor,
+        cScale7: sanitizedTertiaryColor,
+        cScale8: sanitizedTertiaryColor,
+        // Alternative flowchart color variables
+        c6: sanitizedTertiaryColor,
+        c7: sanitizedTertiaryColor,
+        c8: sanitizedTertiaryColor,
       }),
       ...(customColors?.borderColor && isValidHexColor(customColors.borderColor) && {
         primaryBorderColor: sanitizedBorderColor,
@@ -394,6 +418,11 @@ export default function MermaidChart({
       ...(customColors?.textColor && isValidHexColor(customColors.textColor) && {
         // Primary node text color
         primaryTextColor: sanitizedTextColor,
+        nodeTextColor: sanitizedTextColor,
+        // For class diagrams
+        classText: sanitizedTextColor,
+        // For state diagrams
+        labelColor: sanitizedTextColor,
       }),
       ...(customColors?.secondaryTextColor && isValidHexColor(customColors.secondaryTextColor) && {
         // Secondary node text color
@@ -407,6 +436,12 @@ export default function MermaidChart({
         // Label text color (text outside boxes - labels, edge text)
         textColor: sanitizedLabelTextColor,
         titleColor: sanitizedLabelTextColor,
+        // For edge labels
+        edgeLabelColor: sanitizedLabelTextColor,
+        // For sequence diagrams
+        actorTextColor: sanitizedLabelTextColor,
+        // For pie charts
+        pieLegendTextColor: sanitizedLabelTextColor,
       }),
       ...(customColors?.lineColor && isValidHexColor(customColors.lineColor) && {
         lineColor: sanitizedLineColor,
@@ -492,7 +527,6 @@ export default function MermaidChart({
       })
     }
   }, [style, direction, customColors, customStyles])
-
   useEffect(() => {
     const renderChart = async () => {
       if (!containerRef.current || !chart.trim()) return
@@ -509,7 +543,7 @@ export default function MermaidChart({
           transformedChart = chart.replace(/^graph\s+(TD|LR|RL|BT)/m, `graph ${direction}`)
         }
 
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`
+        const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`
         const { svg } = await mermaid.render(id, transformedChart)
 
         const parser = new DOMParser()
@@ -517,6 +551,20 @@ export default function MermaidChart({
         const svgElement = svgDoc.querySelector("svg")
 
         if (svgElement) {
+          // Get base style preset for fallback values
+          const baseStyle = stylePresets[style as keyof typeof stylePresets] || stylePresets.pastel
+
+          // Sanitize custom colors for manual application
+          const sanitizedPrimaryColor = sanitizeColor(customColors?.primaryColor, baseStyle.primaryColor)
+          const sanitizedSecondaryColor = sanitizeColor(customColors?.secondaryColor, baseStyle.secondaryColor)
+          const sanitizedTertiaryColor = sanitizeColor(customColors?.tertiaryColor, baseStyle.tertiaryColor)
+          const sanitizedTextColor = sanitizeColor(customColors?.textColor, baseStyle.primaryTextColor)
+          const sanitizedSecondaryTextColor = sanitizeColor(customColors?.secondaryTextColor, baseStyle.secondaryTextColor)
+          const sanitizedTertiaryTextColor = sanitizeColor(customColors?.tertiaryTextColor, baseStyle.tertiaryTextColor)
+          const sanitizedLabelTextColor = sanitizeColor(customColors?.labelTextColor, baseStyle.textColor)
+          const sanitizedBorderColor = sanitizeColor(customColors?.borderColor, baseStyle.primaryBorderColor)
+          const sanitizedLineColor = sanitizeColor(customColors?.lineColor, baseStyle.lineColor)
+
           // Apply custom line styles based on diagram type
           if (diagramType === 'flowchart' || diagramType === 'sequence' || diagramType === 'state') {
             const paths = svgElement.querySelectorAll("path")
@@ -684,7 +732,150 @@ export default function MermaidChart({
             })
           }
 
-          // Apply custom font styles and separate text colors
+          // FORCE APPLY CUSTOM COLORS - Simple and effective approach
+          console.log("🎨 Applying custom colors:", customColors)
+          console.log("🎨 Sanitized colors:", {
+            primary: sanitizedPrimaryColor,
+            secondary: sanitizedSecondaryColor,
+            tertiary: sanitizedTertiaryColor,
+            text: sanitizedTextColor,
+            border: sanitizedBorderColor,
+            line: sanitizedLineColor
+          })
+
+          // Apply colors to all shapes with smarter logic
+          const allShapes = svgElement.querySelectorAll("rect, circle, polygon, ellipse")
+          console.log(`🎨 Found ${allShapes.length} shapes`)
+
+          // Separate shapes by type for better color assignment
+          const rectangles = svgElement.querySelectorAll("rect")
+          const diamonds = svgElement.querySelectorAll("polygon")
+          const circles = svgElement.querySelectorAll("circle")
+          const ellipses = svgElement.querySelectorAll("ellipse")
+
+          console.log(`🎨 Shape breakdown: ${rectangles.length} rects, ${diamonds.length} polygons, ${circles.length} circles, ${ellipses.length} ellipses`)
+
+          // Apply primary color to rectangles
+          rectangles.forEach((shape, index) => {
+            console.log(`🎨 Coloring rectangle ${index} with primary color ${sanitizedPrimaryColor}`)
+            shape.setAttribute("fill", sanitizedPrimaryColor)
+            const svgShape = shape as SVGElement
+            if (svgShape.style) {
+              svgShape.style.fill = sanitizedPrimaryColor
+            }
+            if (customColors?.borderColor) {
+              shape.setAttribute("stroke", sanitizedBorderColor)
+              if (svgShape.style) {
+                svgShape.style.stroke = sanitizedBorderColor
+              }
+            }
+          })
+
+          // Apply secondary color to diamonds/polygons
+          diamonds.forEach((shape, index) => {
+            console.log(`🎨 Coloring diamond ${index} with secondary color ${sanitizedSecondaryColor}`)
+            shape.setAttribute("fill", sanitizedSecondaryColor)
+            const svgShape = shape as SVGElement
+            if (svgShape.style) {
+              svgShape.style.fill = sanitizedSecondaryColor
+            }
+            if (customColors?.borderColor) {
+              shape.setAttribute("stroke", sanitizedBorderColor)
+              if (svgShape.style) {
+                svgShape.style.stroke = sanitizedBorderColor
+              }
+            }
+          })
+
+          // Apply tertiary color to circles
+          circles.forEach((shape, index) => {
+            console.log(`🎨 Coloring circle ${index} with tertiary color ${sanitizedTertiaryColor}`)
+            shape.setAttribute("fill", sanitizedTertiaryColor)
+            const svgShape = shape as SVGElement
+            if (svgShape.style) {
+              svgShape.style.fill = sanitizedTertiaryColor
+            }
+            if (customColors?.borderColor) {
+              shape.setAttribute("stroke", sanitizedBorderColor)
+              if (svgShape.style) {
+                svgShape.style.stroke = sanitizedBorderColor
+              }
+            }
+          })
+
+          // Apply tertiary color to ellipses as well
+          ellipses.forEach((shape, index) => {
+            console.log(`🎨 Coloring ellipse ${index} with tertiary color ${sanitizedTertiaryColor}`)
+            shape.setAttribute("fill", sanitizedTertiaryColor)
+            const svgShape = shape as SVGElement
+            if (svgShape.style) {
+              svgShape.style.fill = sanitizedTertiaryColor
+            }
+            if (customColors?.borderColor) {
+              shape.setAttribute("stroke", sanitizedBorderColor)
+              if (svgShape.style) {
+                svgShape.style.stroke = sanitizedBorderColor
+              }
+            }
+          })
+
+          // Apply colors to text based on parent shape type
+          const allTexts = svgElement.querySelectorAll("text, tspan")
+          console.log(`🎨 Found ${allTexts.length} text elements`)
+
+          allTexts.forEach((text, index) => {
+            const parentNode = text.closest("g")
+            let textColor = sanitizedTextColor // default to primary text color
+
+            if (parentNode) {
+              // Check what type of shape this text belongs to
+              const parentRect = parentNode.querySelector("rect")
+              const parentPolygon = parentNode.querySelector("polygon")
+              const parentCircle = parentNode.querySelector("circle")
+
+              if (parentRect) {
+                // Text inside rectangle - use primary text color
+                textColor = sanitizedTextColor
+                console.log(`🎨 Coloring rectangle text ${index} with primary text color ${textColor}`)
+              } else if (parentPolygon) {
+                // Text inside diamond/polygon - use secondary text color
+                textColor = sanitizedSecondaryTextColor
+                console.log(`🎨 Coloring diamond text ${index} with secondary text color ${textColor}`)
+              } else if (parentCircle) {
+                // Text inside circle - use tertiary text color
+                textColor = sanitizedTertiaryTextColor
+                console.log(`🎨 Coloring circle text ${index} with tertiary text color ${textColor}`)
+              } else {
+                // Text outside shapes (labels, edge text) - use label text color
+                textColor = sanitizedLabelTextColor
+                console.log(`🎨 Coloring label text ${index} with label text color ${textColor}`)
+              }
+            }
+
+            text.setAttribute("fill", textColor)
+            const svgText = text as SVGElement
+            if (svgText.style) {
+              svgText.style.fill = textColor
+            }
+          })
+
+          // Apply colors to all paths
+          const allPaths = svgElement.querySelectorAll("path")
+          console.log(`🎨 Found ${allPaths.length} paths`)
+          allPaths.forEach((path, index) => {
+            if (customColors?.lineColor) {
+              console.log(`🎨 Coloring path ${index} with ${sanitizedLineColor}`)
+              path.setAttribute("stroke", sanitizedLineColor)
+
+              // Cast to SVGElement to access style property
+              const svgPath = path as SVGElement
+              if (svgPath.style) {
+                svgPath.style.stroke = sanitizedLineColor
+              }
+            }
+          })
+
+          // Apply custom font styles
           const textElements = svgElement.querySelectorAll("text, tspan")
           textElements.forEach((textElement) => {
             // Apply font styles
@@ -696,39 +887,6 @@ export default function MermaidChart({
             }
             if (customStyles?.fontWeight) {
               textElement.setAttribute("font-weight", customStyles.fontWeight)
-            }
-
-            // Apply text colors based on context and node background color
-            const parentNode = textElement.closest('g.node')
-            const isEdgeLabel = textElement.closest('g.edgeLabel') || textElement.closest('g.label')
-            const isTitle = textElement.closest('g.titleText') || textElement.classList.contains('titleText')
-
-            if (parentNode && !isEdgeLabel && !isTitle) {
-              // Text inside nodes/boxes - determine which text color to use based on node background
-              const nodeRect = parentNode.querySelector('rect, circle, polygon')
-              if (nodeRect) {
-                const nodeFillColor = nodeRect.getAttribute('fill') || ''
-
-                // Match node background color to determine appropriate text color
-                let textColorToUse = customColors?.textColor // default to primary
-
-                if (customColors?.secondaryColor && isValidHexColor(customColors.secondaryColor) &&
-                  nodeFillColor.toLowerCase() === customColors.secondaryColor.toLowerCase()) {
-                  textColorToUse = customColors?.secondaryTextColor || customColors?.textColor
-                } else if (customColors?.tertiaryColor && isValidHexColor(customColors.tertiaryColor) &&
-                  nodeFillColor.toLowerCase() === customColors.tertiaryColor.toLowerCase()) {
-                  textColorToUse = customColors?.tertiaryTextColor || customColors?.textColor
-                }
-
-                if (textColorToUse && isValidHexColor(textColorToUse)) {
-                  textElement.setAttribute("fill", textColorToUse)
-                }
-              }
-            } else if (isEdgeLabel || isTitle) {
-              // Text outside nodes (labels, edge text, titles) - use labelTextColor
-              if (customColors?.labelTextColor && isValidHexColor(customColors.labelTextColor)) {
-                textElement.setAttribute("fill", customColors.labelTextColor)
-              }
             }
           })
 

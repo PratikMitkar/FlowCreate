@@ -45,20 +45,7 @@ const defaultFlowchartCode = `graph TD
     F -- No --> H{Share Data with Doctor?}
     H -- Yes --> I[Patient Provides Access to Doctor]
     H -- No --> J[No Action]
-    C --> K[End]
-    E --> K
-    G --> K
-    I --> K
-    J --> K
-    
-    %% Apply different colors to demonstrate text color controls
-    classDef primaryClass fill:#00A896,stroke:#0D1B2A,color:#FFFFFF
-    classDef secondaryClass fill:#FF6B6B,stroke:#0D1B2A,color:#FFFFFF  
-    classDef tertiaryClass fill:#FFA500,stroke:#0D1B2A,color:#000000
-    
-    class A,C,E,G,I primaryClass
-    class B,D,F,H secondaryClass
-    class J,K tertiaryClass`
+`
 
 const getDefaultCode = (type: string) => {
   switch (type) {
